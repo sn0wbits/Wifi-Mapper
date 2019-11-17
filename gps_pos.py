@@ -19,6 +19,10 @@ def getGPSPos(debug):
                         print('TRACK:.......{}'.format(posRep.track))
                         conn = True
                     else:
+                        if posRep.lat is None:
+                            pass
+                        if posRep.lon is None:
+                            pass
                         return posRep.lat, posRep.lon, posRep.time, posRep.alt, posRep.speed, posRep.track
 
         except KeyboardInterrupt:
