@@ -4,9 +4,63 @@ import math
 import re
 
 
-# Scans for APs, sends to flipper then either prints or returns
-def scanWifi(debug):
-    wifiScan = Popen(['iwlist', 'wlan0', 'scan'], stdout= PIPE)
+def interface_chekcer():
+    '''
+    Checks for an interface it can use
+    
+    Returns
+    -------
+    iface: str
+        The name of an interface in string form
+    '''
+
+    if_scan = Popen(['ls', '/sys/class/net'], stdout = PIPE)
+    if_list = if_scan.communicate()[0].decode('utf-8')
+    if_list = if_list.split('\n')
+    route_scan = Popen(['netstat', '-rn'], stdout = PIPE)
+    route_list = route_scan.communicate()[0].decode('utf-8')
+
+    for iface in if_list:
+        try:
+            if (iface in route_list):
+                if (not 'tun' in iface and not 'lo' in iface):
+                    return iface
+        except:
+            print('No interface found')
+
+def scanWifi(debug, iface):
+    '''
+    Scans for APs and collects information about them
+
+    Parameters
+    ----------
+    debug : bool
+        A bool to enable or disable debug messages
+    iface : str
+        a string of the interface to use during scanning
+
+    Returns
+    -------
+    ap_list
+        A list of the found AP(s) SSID
+    mac_list
+        A list of the found AP(s) MAC Address
+    sig_list
+        A list of the found AP(s) signal quality and level
+    ch_list
+        A list of the found AP(s) used channel
+    encr_list
+        A list of the encryption state of the found AP(s)
+    dist_list
+        A list of the estimated distance of the found AP(s)
+
+    See Also
+    --------
+    flipper()   : Flips input into correct order
+    distCalc()  : Distance estimate calculation    
+    '''
+
+    wifiScan = Popen(['iwlist', iface, 'scan'], stdout= PIPE)
     wifiScan2 = Popen(['egrep', 'ESSID|Signal|Address|Channel|Encryption key'], stdin = wifiScan.stdout, stdout = PIPE)
     ap_list = wifiScan2.communicate()[0].decode('utf-8')
     ap_list= list(ap_list.split('\n'))
@@ -24,6 +78,34 @@ def scanWifi(debug):
 
 # Flips input based on substrings then calculates distance and returns
 def flipper(input_list):
+    '''
+    Flips input into correct order
+
+    Parameters
+    ----------
+    input_list : list
+        A list that contains the raw data of the scanned AP(s)
+
+    Returns
+    -------
+    ssid
+        The SSID of the found AP(s)
+    maca
+        The MAC Address of the found AP(s)
+    sign
+        The signal quality and level of the found AP(s)
+    chan
+        The channel used by the found AP(s)
+    encr
+        The encryption state of the found AP(s)
+    dist
+        The estimated distance for the scanner to the AP(s)
+    
+    See Also
+    --------
+    distCalc()  : Distance estimate calculation    
+    '''
+    
     ssid = [None] * (len(input_list) + 10)
     maca = [None] * (len(input_list) + 10)
     sign = [None] * (len(input_list) + 10)
@@ -70,6 +152,24 @@ def flipper(input_list):
 
 # Calculates a rough estimate based on the signal level and frequency
 def distCalc(sLevel, freq):
+    '''
+    Calculates a rough estimate
+
+    Parameters
+    ----------
+    sLevel  : str
+        The signal Level
+    freq    : str
+        The frequency used
+
+    Notes
+    -----
+    The distance calculation is based on Free Space Path Loss (FSPL) and
+    is not an accurate way to measure distance from AP(s) as the signal level
+    can greatly vary based on a multitude of factors.
+
+    .. math:: Distance = 10 ^ ((27.55 - (20 * log10(frequency)) + signal level) / 20)
+    '''
     sLevel = re.sub('[0-9][0-9]/[0-9][0-9]|dBm', '', sLevel)
     freq = (float(freq) * 1000)
     dist = (27.55 - (20 * math.log10(freq)) + abs(float(sLevel))) / 20

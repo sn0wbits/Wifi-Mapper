@@ -47,4 +47,3 @@ def collectGPS(ID, lat, lon):
     session.add(t)
     session.commit()
     session.close()
-

@@ -1,11 +1,11 @@
 from sql_tools import wifiTest
-from wifi_sniffer import scanWifi
+from wifi_sniffer import scanWifi, interface_checker
 from gps_pos import getGPSPos
 from geopy.geocoders import Nominatim
 import os
 
 
-def test(debug, count):
+def test(debug, count, iface):
     ap_list, mac_list, sig_list, ch_list, encr_list, dist_list = scanWifi(False)
     lat, lon, time, alt, speed, track = getGPSPos(False)
 
@@ -38,9 +38,11 @@ def getGeoShit(lat, lon):
     return result_s
 
 count = 0
-
+iface = ''      # Change this to staticly set the interface to use
 while True:
     try:
-        count = test(True, count)
+        if (iface == ''):
+            iface = interface_checker()
+        count = test(True, count, iface)
     except KeyboardInterrupt:
         exit()
