@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-<title></title>
+<title>WiFi-Mapper</title>
 </head>
 <style>
 	#output {padding-left: 10px}
