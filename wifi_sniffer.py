@@ -23,7 +23,7 @@ def scanWifi(debug):
         return ap_list, mac_list, sig_list, ch_list, encr_list, dist_list
 
 # Flips input based on substrings then calculates distance and returns
-def __flipper(input_list):
+def flipper(input_list):
     ssid = [None] * (len(input_list) + 10)
     maca = [None] * (len(input_list) + 10)
     sign = [None] * (len(input_list) + 10)
@@ -31,8 +31,9 @@ def __flipper(input_list):
     encr = [None] * (len(input_list) + 10)
     freq = [None] * (len(input_list) + 10)
     dist = [None] * (len(input_list) + 10)
+    counter = 0
 
-    for x in range(0, len(input_list)):
+    for x in input_list:
         if 'ESSID' in  x:
             x = re.sub('                    ESSID:"|"', '', x)
             ssid[counter] = x
@@ -51,6 +52,8 @@ def __flipper(input_list):
         else:
             x = re.sub('                    Frequency:| .*', '', x)
             freq[counter] = x
+        counter += 1
+    counter = 0
 
     ssid = list(filter(None, ssid))
     maca = list(filter(None, maca))
