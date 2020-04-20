@@ -1,0 +1,22 @@
+body {
+	background-color: #262626;
+	font-family: 'Roboto';
+}
+
+h1, h2, h3, h4, p {
+	color: white;
+}
+
+.controls {
+	margin-left: 45%;
+}
+
+.info_list {
+	display: inline-block;
+	margin-left: 15%;
+}
+
+#map {
+	float: right;
+	margin-right: 15%;
+}

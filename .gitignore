@@ -1,0 +1,5 @@
+genDB.py
+*.db
+*.bak
+.vscode
+__pycache__
